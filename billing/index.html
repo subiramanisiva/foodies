@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Street Bites POS - Billing System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Floating Animated Background -->
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar glass-panel">
+            <div class="brand">
+                <i class="fa-solid fa-utensils"></i>
+                <h2>BitePOS</h2>
+            </div>
+
+            <ul class="nav-links">
+                <li class="active" data-tab="pos">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span>Billing</span>
+                </li>
+                <li data-tab="statement">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Monthly Statement</span>
+                </li>
+            </ul>
+
+            <div class="user-profile">
+                <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                <span>Admin</span>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+
+            <!-- POS VIEW -->
+            <section id="pos-view" class="view active">
+                <header class="header">
+                    <h1 class="page-title">New Order</h1>
+                    <div class="header-controls" style="display:flex; gap:16px; align-items:center;">
+                        <button class="cat-btn active" style="margin:0; padding:10px 16px;"
+                            onclick="openAddDishModal()">
+                            <i class="fa-solid fa-plus"></i> Add Item
+                        </button>
+                        <div class="datetime" id="current-datetime">Loading...</div>
+                    </div>
+                </header>
+
+                <div class="pos-grid">
+                    <!-- Products Selection -->
+                    <div class="products-section glass-panel">
+                        <h3>Menu Categories</h3>
+                        <div class="categories">
+                            <button class="cat-btn active">All Items</button>
+                            <button class="cat-btn">Snacks</button>
+                            <button class="cat-btn">Beverages</button>
+                        </div>
+
+                        <div class="product-cards" id="productList">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Cart Billing Section -->
+                    <div class="cart-section glass-panel">
+                        <div class="cart-header">
+                            <h3>Current Bill</h3>
+                            <button class="clear-cart" onclick="clearCart()">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+
+                        <div class="cart-items" id="cartItems">
+                            <div class="empty-cart-msg">
+                                <i class="fa-solid fa-basket-shopping"></i>
+                                <p>Cart is empty</p>
+                            </div>
+                        </div>
+
+                        <div class="cart-summary">
+                            <div class="summary-line">
+                                <span>Subtotal</span>
+                                <span id="cart-subtotal">₹0.00</span>
+                            </div>
+                            <div class="summary-line">
+                                <span>Tax (5%)</span>
+                                <span id="cart-tax">₹0.00</span>
+                            </div>
+                            <div class="summary-line total-line">
+                                <span>Total</span>
+                                <span id="cart-total">₹0.00</span>
+                            </div>
+                            <div class="cart-actions" style="display:flex; gap:12px; margin-top: 16px;">
+                                <button class="checkout-btn"
+                                    style="background: rgba(255,255,255,0.1); box-shadow: none;"
+                                    onclick="window.print()">
+                                    <i class="fa-solid fa-print"></i> Print
+                                </button>
+                                <button class="checkout-btn" style="flex-grow:2;" onclick="processCheckout()">
+                                    <i class="fa-solid fa-money-bill-wave"></i> Charge
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STATEMENT VIEW -->
+            <section id="statement-view" class="view hidden">
+                <header class="header">
+                    <h1 class="page-title">Monthly Statement</h1>
+                    <div class="statement-controls">
+                        <select id="month-filter" class="glass-select">
+                            <!-- Months populated by JS -->
+                        </select>
+                    </div>
+                </header>
+
+                <div class="stats-grid">
+                    <div class="stat-card glass-panel">
+                        <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
+                        <div class="stat-info">
+                            <p>Total Revenue</p>
+                            <h2 id="total-revenue">₹0.00</h2>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel">
+                        <div class="stat-icon"><i class="fa-solid fa-receipt"></i></div>
+                        <div class="stat-info">
+                            <p>Total Orders</p>
+                            <h2 id="total-orders">0</h2>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel">
+                        <div class="stat-icon"><i class="fa-solid fa-fire"></i></div>
+                        <div class="stat-info">
+                            <p>Top Item</p>
+                            <h2 id="top-item">-</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="transactions-section glass-panel">
+                    <h3>Recent Transactions</h3>
+                    <div class="table-responsive">
+                        <table class="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Date & Time</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transaction-list">
+                                <!-- Injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast">Payment Successful!</div>
+
+    <!-- Add Dish Modal -->
+    <div id="addDishModal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel" style="width: 400px; max-width: 90%; margin: 100px auto; padding: 24px;">
+            <div class="modal-header"
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h2>Add Menu Item</h2>
+                <button class="clear-cart" onclick="closeAddDishModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; color:var(--text-secondary);">Item Name</label>
+                    <input type="text" id="newDishName" class="glass-select" style="width:100%; box-sizing:border-box;"
+                        placeholder="E.g., Samosa">
+                </div>
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; color:var(--text-secondary);">Price (₹)</label>
+                    <input type="number" id="newDishPrice" class="glass-select"
+                        style="width:100%; box-sizing:border-box;" placeholder="20">
+                </div>
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; color:var(--text-secondary);">Category</label>
+                    <select id="newDishCategory" class="glass-select" style="width:100%; box-sizing:border-box;">
+                        <option value="Snacks">Snacks</option>
+                        <option value="Beverages">Beverages</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:20px;">
+                    <label style="display:block; margin-bottom:5px; color:var(--text-secondary);">Icon (Emoji)</label>
+                    <input type="text" id="newDishIcon" class="glass-select" style="width:100%; box-sizing:border-box;"
+                        placeholder="🥟">
+                </div>
+                <button class="checkout-btn" onclick="saveNewDish()" style="width:100%;">Save Item</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
